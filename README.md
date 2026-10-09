@@ -1,5 +1,7 @@
 # Filament Identity Verification Action
 
+![Identity Verification Action](art/banner.png)
+
 `filament-Identity-verification-action` — package `syriable/filament-identity-verification-action`.
 
 Ask users to confirm their identity (their current password, by default) before a sensitive Filament 5 action opens, and refuse to run that action on the server unless a fresh, scoped, single-use verification grant is presented.
@@ -9,6 +11,10 @@ Ask users to confirm their identity (their current password, by default) before 
 - The protected action re-validates the grant on the server when it executes. A grant is bound to the user, the auth guard and a purpose; it expires, can be revoked, and is consumed atomically.
 - The action's own validation, authorization, form schema and business logic are untouched.
 - The verification core is UI-agnostic, and new verification methods can be added through a contract.
+
+![How it works](art/identity-verification-action.gif)
+
+A 33-second explainer is also available as [MP4](art/identity-verification-action.mp4).
 
 ## Requirements
 
@@ -80,6 +86,8 @@ The plugin adds no pages, resources, navigation or global hooks. Protected actio
 
 ## Protecting an action
 
+![Usage](art/usage.png)
+
 Protection lives in the action's class, through the `RequiresIdentityVerification` trait. For inline actions, use `ProtectedAction` (a plain `Action` that already uses the trait):
 
 ```php
@@ -130,6 +138,8 @@ Automated tests cover two contexts: actions returned from `fooAction()` methods 
 Filament's lifecycle hooks (`mountUsing`, `before`, `fillForm`, ...) each hold a single closure, so a later fluent call would silently replace a check installed by a macro. Filament also clones actions, so state kept outside the action object would not follow the clone. Because the checks are overridden lifecycle methods on the action class, no later configuration can remove them, and they survive cloning. An action that does not use the trait is not protected, and calling `requiresIdentityVerification()` on it throws.
 
 ## What happens at runtime
+
+![How it works: verify, issue a scoped grant, then run the protected action](art/how-it-works.png)
 
 1. The user clicks the protected action, and Filament calls `mountAction('updateEmail')`.
 2. The action has no valid grant, so its `mount()` does not fill the form or run `beforeFormFilled`/`afterFormFilled`. It mounts the `identityVerification` modal action as its child instead.
@@ -232,6 +242,8 @@ Failures throw `InvalidVerification`, whose `reason` is a `VerificationFailure` 
 To store grants elsewhere, bind your own implementation of `Verification\Contracts\VerificationGrantStore` in the container. The store receives only token hashes. `consume()` must be atomic.
 
 ## Security notes and known limitations
+
+![Security model: bypass attempts are rejected on the server](art/security.png)
 
 - **Supported placement.** A protected action must be mounted as a root action, not as a child modal action of another action. In the child case it throws a `LogicException`, because `replaceMountedAction()` would discard the parent. Root placement is tested for Livewire component actions and table record actions.
 - **Only trait-based actions are protected.** Filament actions that don't use `RequiresIdentityVerification` are not affected by this package.

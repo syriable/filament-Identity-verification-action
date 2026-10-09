@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Identity Verification Action — explainer</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+    body { width: 1920px; height: 1080px; }
+    .stage { width: 1920px; height: 1080px; }
+    .abs { position: absolute; }
+    .scene { position: absolute; inset: 0; opacity: 0; }
+
+    /* Title */
+    #title-shield { left: 50%; top: 250px; width: 150px; height: 170px; margin-left: -75px; }
+    #title-h { left: 0; right: 0; top: 470px; text-align: center; font-family: var(--display); font-weight: 700; font-size: 88px; letter-spacing: -0.02em; }
+    #title-sub { left: 0; right: 0; top: 590px; text-align: center; font-size: 30px; color: var(--muted); }
+    #title-tag { left: 0; right: 0; top: 660px; text-align: center; }
+
+    /* App mock */
+    #app { left: 360px; top: 230px; width: 1200px; padding: 48px 56px 24px; }
+    .app-h { font-family: var(--display); font-size: 40px; font-weight: 700; }
+    .app-p { color: var(--muted); font-size: 20px; margin-top: 8px; }
+    .row { display: flex; align-items: center; justify-content: space-between; padding: 30px 0; border-top: 1px solid var(--line); }
+    .row.first { margin-top: 36px; }
+    .row-l { font-size: 18px; color: var(--muted); }
+    .row-v { font-size: 26px; margin-top: 6px; }
+
+    #backdrop { inset: 0; background: rgba(2, 6, 23, 0.72); opacity: 0; }
+
+    /* Modals */
+    .modal { left: 50%; top: 50%; width: 720px; margin-left: -360px; padding: 44px 48px; opacity: 0; }
+    .modal-icon { width: 64px; height: 64px; border-radius: 18px; background: var(--amber-soft); display: grid; place-items: center; }
+    .modal-h { font-family: var(--display); font-size: 36px; font-weight: 700; margin-top: 24px; }
+    .modal-p { color: var(--muted); font-size: 20px; margin-top: 10px; line-height: 1.45; }
+    .label { font-size: 18px; color: var(--muted); margin: 30px 0 10px; }
+    .actions { display: flex; gap: 14px; margin-top: 32px; }
+    .dots { letter-spacing: 6px; font-size: 26px; }
+    .caret { display: inline-block; width: 2px; height: 26px; background: var(--amber); margin-left: 4px; vertical-align: middle; }
+    .err { color: var(--red); }
+
+    /* Grant */
+    #grant { left: 50%; top: 50%; width: 760px; margin-left: -380px; margin-top: -230px; padding: 40px 44px; opacity: 0; }
+    .grant-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-top: 1px solid var(--line); font-size: 22px; opacity: 0; }
+    .grant-row span:first-child { color: var(--muted); }
+
+    /* Server badge + toast */
+    #server { right: 80px; top: 60px; padding: 18px 24px; opacity: 0; }
+    #toast { right: 120px; bottom: 140px; padding: 20px 26px; opacity: 0; display: flex; gap: 14px; align-items: center; font-size: 22px; }
+
+    /* Bypass list */
+    #bypass-h { left: 0; right: 0; top: 150px; text-align: center; font-family: var(--display); font-size: 64px; font-weight: 700; letter-spacing: -0.015em; }
+    #bypass-sub { left: 0; right: 0; top: 245px; text-align: center; font-size: 26px; color: var(--muted); }
+    #bypass-list { left: 50%; top: 340px; width: 1160px; margin-left: -580px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .b-item { display: flex; align-items: center; gap: 18px; padding: 24px 28px; font-size: 26px; opacity: 0; }
+    .b-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 22px; flex: none; }
+    .b-no { background: var(--red-soft); color: var(--red); }
+    .b-ok { background: var(--green-soft); color: var(--green); }
+    #bypass-ok { left: 50%; top: 690px; width: 1160px; margin-left: -580px; }
+
+    /* Outro */
+    #outro-h { left: 0; right: 0; top: 210px; text-align: center; font-family: var(--display); font-size: 58px; font-weight: 700; letter-spacing: -0.015em; }
+    #outro-code { left: 50%; top: 330px; width: 1240px; margin-left: -620px; padding: 40px 48px; }
+    #outro-cmd { left: 50%; top: 670px; width: 1240px; margin-left: -620px; padding: 26px 36px; font-family: var(--mono); font-size: 26px; display: flex; gap: 16px; }
+    #outro-foot { left: 0; right: 0; top: 800px; text-align: center; color: var(--muted); font-size: 24px; }
+    .win { display: flex; gap: 8px; margin-bottom: 24px; }
+    .win i { width: 14px; height: 14px; border-radius: 50%; background: #334155; display: block; }
+
+    /* Caption + progress */
+    #caption { left: 0; right: 0; bottom: 70px; text-align: center; font-size: 28px; font-weight: 600; opacity: 0; }
+    #caption b { color: var(--amber); font-family: var(--mono); font-weight: 700; margin-right: 14px; }
+    #progress { left: 0; bottom: 0; height: 5px; background: var(--amber); }
+
+    #cursor { width: 34px; height: 34px; left: 0; top: 0; opacity: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
+    #ripple { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--amber); opacity: 0; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+    <div class="grid"></div>
+
+    <!-- 1. Title -->
+    <div class="scene" id="s-title">
+        <svg id="title-shield" class="abs" viewBox="0 0 150 170">
+            <path id="shield-path" d="M75 8 L138 32 V86 C138 124 110 150 75 162 C40 150 12 124 12 86 V32 Z" fill="rgba(245,158,11,.12)" stroke="#f59e0b" stroke-width="6" stroke-linejoin="round"/>
+            <path id="shield-check" d="M48 86 L68 106 L104 66" fill="none" stroke="#f59e0b" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div id="title-h" class="abs">Identity Verification Action</div>
+        <div id="title-sub" class="abs">A Filament 5 plugin for protecting sensitive actions</div>
+        <div id="title-tag" class="abs"><span class="chip mono">syriable/filament-identity-verification-action</span></div>
+    </div>
+
+    <!-- 2–4. App -->
+    <div class="scene" id="s-app">
+        <div id="app" class="abs card">
+            <div class="app-h">Account settings</div>
+            <div class="app-p">Manage how you sign in and how we reach you.</div>
+            <div class="row first">
+                <div><div class="row-l">Email address</div><div class="row-v" id="email-value">old@example.com</div></div>
+                <div class="btn btn-primary" id="btn-change">Change email</div>
+            </div>
+            <div class="row">
+                <div><div class="row-l">Password</div><div class="row-v">••••••••••</div></div>
+                <div class="btn btn-ghost">Change password</div>
+            </div>
+            <div class="row">
+                <div><div class="row-l">Account</div><div class="row-v">Delete account and all data</div></div>
+                <div class="btn btn-ghost" style="color: var(--red)">Delete account</div>
+            </div>
+        </div>
+        <div id="backdrop" class="abs"></div>
+
+        <div id="m-verify" class="abs modal card">
+            <div class="modal-icon">
+                <svg width="34" height="38" viewBox="0 0 150 170"><path d="M75 8 L138 32 V86 C138 124 110 150 75 162 C40 150 12 124 12 86 V32 Z" fill="none" stroke="#f59e0b" stroke-width="14" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="modal-h">Confirm your identity</div>
+            <div class="modal-p">For your security, please confirm your identity before continuing.</div>
+            <div class="label">Current password</div>
+            <div class="input"><span class="dots" id="pw"></span><span class="caret" id="pw-caret"></span></div>
+            <div class="actions">
+                <div class="btn btn-primary" id="btn-confirm">Confirm</div>
+                <div class="btn btn-ghost">Cancel</div>
+            </div>
+        </div>
+
+        <div id="grant" class="abs card">
+            <div class="eyebrow">Verification grant issued</div>
+            <div class="modal-h" style="margin-top: 14px; margin-bottom: 18px">Scoped. Short-lived. Single-use.</div>
+            <div class="grant-row"><span>Bound to user</span><span class="mono">App\Models\User #42</span></div>
+            <div class="grant-row"><span>Auth guard</span><span class="mono">web</span></div>
+            <div class="grant-row"><span>Purpose</span><span class="mono" style="color: var(--amber)">update_email</span></div>
+            <div class="grant-row"><span>Expires</span><span class="mono">in 5 minutes</span></div>
+            <div class="grant-row"><span>Stored as</span><span class="mono">sha256 hash · single-use</span></div>
+        </div>
+
+        <div id="m-email" class="abs modal card">
+            <div class="modal-h" style="margin-top: 0">Change email</div>
+            <div class="modal-p">Your identity is confirmed. Enter your new address.</div>
+            <div class="label">Email address</div>
+            <div class="input"><span id="email-typed"></span><span class="caret" id="email-caret"></span></div>
+            <div class="actions">
+                <div class="btn btn-primary" id="btn-save">Save</div>
+                <div class="btn btn-ghost">Cancel</div>
+            </div>
+        </div>
+
+        <div id="server" class="abs card">
+            <div class="eyebrow" style="color: var(--green)">Server check</div>
+            <div style="font-size: 22px; margin-top: 8px">✓ Grant verified &amp; consumed</div>
+            <div style="font-size: 18px; color: var(--muted); margin-top: 4px">✓ Authorization &amp; validation passed</div>
+        </div>
+
+        <div id="toast" class="abs card">
+            <div class="b-icon b-ok">✓</div>
+            <div>Email updated</div>
+        </div>
+    </div>
+
+    <!-- 5. Bypass -->
+    <div class="scene" id="s-bypass">
+        <div id="bypass-h" class="abs">Bypass attempts fail on the server</div>
+        <div id="bypass-sub" class="abs">Hiding a form is not security. Every execution is checked.</div>
+        <div id="bypass-list" class="abs">
+            <div class="b-item card"><div class="b-icon b-no">✕</div>No grant: direct call</div>
+            <div class="b-item card"><div class="b-icon b-no">✕</div>Forged or guessed token</div>
+            <div class="b-item card"><div class="b-icon b-no">✕</div>Expired or revoked grant</div>
+            <div class="b-item card"><div class="b-icon b-no">✕</div>Another user's grant</div>
+            <div class="b-item card"><div class="b-icon b-no">✕</div>Grant for another purpose</div>
+            <div class="b-item card"><div class="b-icon b-no">✕</div>Replayed single-use grant</div>
+        </div>
+        <div id="bypass-ok" class="abs"><div class="b-item card" style="justify-content: center"><div class="b-icon b-ok">✓</div>Your policies, authorization and validation still apply</div></div>
+    </div>
+
+    <!-- 6. Outro -->
+    <div class="scene" id="s-outro">
+        <div id="outro-h" class="abs">Protect a sensitive action in one line</div>
+        <div id="outro-code" class="abs card">
+            <div class="win"><i></i><i></i><i></i></div>
+<div class="code"><span class="c">ProtectedAction</span>::<span class="m">make</span>(<span class="s">'updateEmail'</span>)
+    -><span class="m">requiresIdentityVerification</span>(<span class="n">purpose:</span> <span class="s">'update_email'</span>)
+    -><span class="m">schema</span>([...])
+    -><span class="m">action</span>(<span class="k">fn</span> (<span class="k">array</span> $data) => ...);</div>
+        </div>
+        <div id="outro-cmd" class="abs card"><span style="color: var(--amber)">$</span><span>composer require syriable/filament-identity-verification-action</span></div>
+        <div id="outro-foot" class="abs">Filament 5 · Laravel 11–13 · MIT licensed</div>
+    </div>
+
+    <div id="caption" class="abs"><b id="cap-n">01</b><span id="cap-t"></span></div>
+    <div id="ripple" class="abs"></div>
+    <svg id="cursor" class="abs" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15 L12.5 22 L15.5 20.6 L12 13.8 L19 13.8 Z" fill="#fff" stroke="#0a0f1c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    <div id="progress" class="abs"></div>
+</div>
+
+<script>
+const DURATION = 33;
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const outCubic = (p) => 1 - Math.pow(1 - p, 3);
+const inOut = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+const outBack = (p) => { const c = 1.6; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const lerp = (a, b, p) => a + (b - a) * p;
+
+// Opacity envelope: fade in over [a, a+f], hold, fade out over [b-f, b].
+const env = (t, a, b, f = 0.45) => Math.min(seg(t, a, a + f), 1 - seg(t, b - f, b));
+
+const shieldLen = 470;
+$('shield-path').style.strokeDasharray = shieldLen;
+$('shield-check').style.strokeDasharray = 90;
+
+const CAPTIONS = [
+    [4.3, 8.4, '01', 'A user starts a sensitive action'],
+    [8.6, 13.9, '02', 'They confirm it is really them'],
+    [14.1, 18.4, '03', 'The server issues a scoped, single-use grant'],
+    [18.6, 23.4, '04', 'Only then does the protected action run'],
+];
+
+// Cursor keyframes: [time, x, y]
+const CURSOR = [
+    [4.6, 1500, 980], [6.2, 1385, 438], [7.6, 1385, 438],
+    [10.4, 1100, 860], [11.7, 700, 722], [13.4, 700, 722],
+    [18.8, 1100, 860], [21.4, 690, 678], [22.6, 690, 678],
+];
+
+function cursorAt(t) {
+    if (t < CURSOR[0][0]) return CURSOR[0];
+    for (let i = 0; i < CURSOR.length - 1; i++) {
+        const [t0, x0, y0] = CURSOR[i], [t1, x1, y1] = CURSOR[i + 1];
+        if (t >= t0 && t <= t1) { const p = inOut(seg(t, t0, t1)); return [t, lerp(x0, x1, p), lerp(y0, y1, p)]; }
+    }
+    return CURSOR[CURSOR.length - 1];
+}
+
+const CLICKS = [6.5, 12.1, 21.9];
+
+function typed(text, t, a, b) {
+    const n = Math.round(text.length * seg(t, a, b));
+    return text.slice(0, n);
+}
+
+function render(t) {
+    // Scene envelopes
+    $('s-title').style.opacity = env(t, 0, 4.2, 0.4) * (t < 0.01 ? 0 : 1);
+    $('s-app').style.opacity = env(t, 4.0, 23.6);
+    $('s-bypass').style.opacity = env(t, 23.4, 28.3);
+    $('s-outro').style.opacity = env(t, 28.1, DURATION + 1);
+
+    // Title
+    const draw = outCubic(seg(t, 0.2, 1.6));
+    $('shield-path').style.strokeDashoffset = shieldLen * (1 - draw);
+    $('shield-check').style.strokeDashoffset = 90 * (1 - outCubic(seg(t, 1.3, 2.0)));
+    const tp = outCubic(seg(t, 0.8, 1.6));
+    $('title-h').style.opacity = tp; $('title-h').style.transform = `translateY(${(1 - tp) * 30}px)`;
+    const sp = outCubic(seg(t, 1.2, 2.0));
+    $('title-sub').style.opacity = sp; $('title-sub').style.transform = `translateY(${(1 - sp) * 20}px)`;
+    $('title-tag').style.opacity = outCubic(seg(t, 1.7, 2.4));
+
+    // App card
+    const ap = outCubic(seg(t, 4.0, 4.8));
+    $('app').style.transform = `translateY(${(1 - ap) * 40}px) scale(${lerp(0.97, 1, ap)})`;
+    $('btn-change').style.transform = `scale(${t > 6.45 && t < 6.7 ? 0.95 : 1})`;
+    $('email-value').textContent = t > 22.4 ? 'new@example.com' : 'old@example.com';
+    $('email-value').style.color = t > 22.4 ? 'var(--amber)' : '';
+
+    // Backdrop: verify modal, grant and email modal
+    $('backdrop').style.opacity = env(t, 6.8, 22.75, 0.4);
+
+    // Verify modal
+    const vIn = outBack(seg(t, 6.9, 7.5)), vOut = seg(t, 13.6, 14.2);
+    $('m-verify').style.opacity = Math.min(seg(t, 6.9, 7.3), 1 - vOut);
+    $('m-verify').style.transform = `translateY(-50%) scale(${lerp(0.92, 1, vIn) - vOut * 0.08})`;
+    const pw = typed('••••••••••••', t, 8.4, 10.3);
+    $('pw').textContent = pw;
+    $('pw-caret').style.opacity = t < 12.1 && Math.floor(t * 2.4) % 2 === 0 ? 1 : 0;
+    const confirmed = t > 12.15;
+    $('btn-confirm').textContent = confirmed ? '✓ Verified' : 'Confirm';
+    $('btn-confirm').style.background = confirmed ? 'var(--green)' : '';
+    $('btn-confirm').style.transform = `scale(${t > 12.05 && t < 12.3 ? 0.95 : 1})`;
+
+    // Grant card
+    const gIn = outCubic(seg(t, 14.1, 14.7)), gOut = seg(t, 18.0, 18.5);
+    $('grant').style.opacity = Math.min(gIn, 1 - gOut);
+    $('grant').style.transform = `translateY(${(1 - gIn) * 40 - gOut * 40}px)`;
+    document.querySelectorAll('.grant-row').forEach((row, i) => {
+        const p = outCubic(seg(t, 14.7 + i * 0.4, 15.1 + i * 0.4));
+        row.style.opacity = p;
+        row.style.transform = `translateX(${(1 - p) * -24}px)`;
+    });
+
+    // Email modal
+    const eIn = outBack(seg(t, 18.5, 19.1)), eOut = seg(t, 22.15, 22.45);
+    $('m-email').style.opacity = Math.min(seg(t, 18.5, 18.9), 1 - eOut);
+    $('m-email').style.transform = `translateY(-50%) scale(${lerp(0.92, 1, eIn) - eOut * 0.08})`;
+    const base = 'old@example.com';
+    let emailText = base;
+    if (t > 19.6) emailText = base.slice(0, Math.round(base.length * (1 - seg(t, 19.6, 20.0))));
+    if (t > 20.0) emailText = typed('new@example.com', t, 20.0, 21.0);
+    $('email-typed').textContent = emailText;
+    $('email-caret').style.opacity = t < 21.9 && Math.floor(t * 2.4) % 2 === 0 ? 1 : 0;
+    $('btn-save').style.transform = `scale(${t > 21.85 && t < 22.1 ? 0.95 : 1})`;
+
+    const svIn = outCubic(seg(t, 22.0, 22.5));
+    $('server').style.opacity = Math.min(svIn, 1 - seg(t, 23.0, 23.5));
+    $('server').style.transform = `translateX(${(1 - svIn) * 40}px)`;
+    const toIn = outCubic(seg(t, 22.5, 23.0));
+    $('toast').style.opacity = Math.min(toIn, 1 - seg(t, 23.1, 23.5));
+    $('toast').style.transform = `translateY(${(1 - toIn) * 30}px)`;
+
+    // Bypass
+    const bh = outCubic(seg(t, 23.6, 24.2));
+    $('bypass-h').style.opacity = bh; $('bypass-h').style.transform = `translateY(${(1 - bh) * 24}px)`;
+    $('bypass-sub').style.opacity = outCubic(seg(t, 23.9, 24.5));
+    document.querySelectorAll('#bypass-list .b-item').forEach((item, i) => {
+        const p = outBack(seg(t, 24.4 + i * 0.28, 24.85 + i * 0.28));
+        item.style.opacity = clamp(p);
+        item.style.transform = `scale(${lerp(0.9, 1, p)})`;
+    });
+    const okp = outBack(seg(t, 26.4, 26.9));
+    const ok = document.querySelector('#bypass-ok .b-item');
+    ok.style.opacity = clamp(okp); ok.style.transform = `scale(${lerp(0.9, 1, okp)})`;
+
+    // Outro
+    const oh = outCubic(seg(t, 28.2, 28.8));
+    $('outro-h').style.opacity = oh; $('outro-h').style.transform = `translateY(${(1 - oh) * 24}px)`;
+    const oc = outCubic(seg(t, 28.5, 29.2));
+    $('outro-code').style.opacity = oc; $('outro-code').style.transform = `translateY(${(1 - oc) * 30}px)`;
+    const om = outCubic(seg(t, 28.9, 29.6));
+    $('outro-cmd').style.opacity = om; $('outro-cmd').style.transform = `translateY(${(1 - om) * 30}px)`;
+    $('outro-foot').style.opacity = outCubic(seg(t, 29.5, 30.2));
+
+    // Caption
+    let capOpacity = 0;
+    for (const [a, b, n, text] of CAPTIONS) {
+        if (t >= a && t <= b) { capOpacity = env(t, a, b, 0.35); $('cap-n').textContent = n; $('cap-t').textContent = text; }
+    }
+    $('caption').style.opacity = capOpacity;
+    $('caption').style.transform = `translateY(${(1 - capOpacity) * 12}px)`;
+
+    // Cursor
+    const [, cx, cy] = cursorAt(t);
+    $('cursor').style.opacity = Math.max(env(t, 4.6, 13.5, 0.3), env(t, 18.9, 22.5, 0.3));
+    $('cursor').style.transform = `translate(${cx}px, ${cy}px)`;
+    let ripple = 0, rp = 0;
+    for (const c of CLICKS) { if (t >= c && t < c + 0.5) { rp = seg(t, c, c + 0.5); ripple = 1 - rp; } }
+    $('ripple').style.opacity = ripple;
+    $('ripple').style.transform = `translate(${cx - 35 + 4}px, ${cy - 35 + 4}px) scale(${0.3 + rp})`;
+
+    $('progress').style.width = `${(t / DURATION) * 100}%`;
+}
+
+window.DURATION = DURATION;
+window.render = render;
+render(Number(new URLSearchParams(location.search).get('t') ?? 2.5));
+</script>
+</body>
+</html>
