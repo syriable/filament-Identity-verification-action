@@ -1,0 +1,13 @@
+.idea
+.vscode
+.phpunit.cache
+.phpunit.result.cache
+build
+coverage
+composer.lock
+composer.local.json
+composer.local.lock
+phpunit.xml
+phpstan.neon
+testbench.yaml
+vendor
