@@ -12,3 +12,4 @@ All notable changes to `syriable/filament-identity-verification-action` are docu
 - Rate limiting of failed attempts, revocation on logout and password reset, and an `identity-verification:prune` command.
 - `IdentityVerificationActionPlugin` for per-panel defaults.
 - English translations.
+- MIT license.
