@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function getConnection(): ?string
+    {
+        return config('filament-identity-verification-action.grants.connection');
+    }
+
+    public function up(): void
+    {
+        Schema::create(config('filament-identity-verification-action.grants.table', 'identity_verification_grants'), function (Blueprint $table): void {
+            $table->id();
+            $table->char('token_hash', 64)->unique();
+            $table->string('guard');
+            $table->string('authenticatable_type');
+            $table->string('authenticatable_id');
+            $table->string('purpose', 100);
+            $table->string('method', 100);
+            $table->timestamp('expires_at')->index();
+            $table->timestamp('consumed_at')->nullable();
+            $table->timestamp('revoked_at')->nullable();
+            $table->timestamp('created_at')->nullable();
+
+            $table->index(['authenticatable_type', 'authenticatable_id', 'guard'], 'identity_verification_grants_subject_index');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists(config('filament-identity-verification-action.grants.table', 'identity_verification_grants'));
+    }
+};

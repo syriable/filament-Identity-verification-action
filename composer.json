@@ -1,0 +1,68 @@
+{
+    "name": "syriable/filament-identity-verification-action",
+    "description": "Reusable identity verification (password re-confirmation) before sensitive Filament 5 actions, enforced server-side with scoped, single-use verification grants.",
+    "keywords": [
+        "syriable",
+        "laravel",
+        "filamentphp",
+        "filament",
+        "filament-plugin",
+        "identity-verification",
+        "password-confirmation",
+        "sudo-mode"
+    ],
+    "homepage": "https://github.com/syriable/filament-identity-verification-action",
+    "support": {
+        "issues": "https://github.com/syriable/filament-identity-verification-action/issues",
+        "source": "https://github.com/syriable/filament-identity-verification-action"
+    },
+    "type": "library",
+    "require": {
+        "php": "^8.2",
+        "filament/filament": "^5.0",
+        "illuminate/contracts": "^11.28|^12.0|^13.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.7|^4.0",
+        "pestphp/pest-plugin-arch": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Syriable\\Filament\\Plugins\\IdentityVerificationAction\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Syriable\\Filament\\Plugins\\IdentityVerificationAction\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "phpstan analyse",
+        "lint": "pint",
+        "test": "pest",
+        "test:lint": "pint --test"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Syriable\\Filament\\Plugins\\IdentityVerificationAction\\IdentityVerificationActionServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
