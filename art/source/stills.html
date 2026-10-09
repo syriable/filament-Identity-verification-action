@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Identity Verification Action — stills</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+    .still { display: none; position: relative; }
+    .still.on { display: block; }
+    .abs { position: absolute; }
+    .h1 { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; }
+    .muted { color: var(--muted); }
+    .shield-badge { width: 64px; height: 64px; border-radius: 18px; background: var(--amber-soft); display: grid; place-items: center; }
+    .row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); }
+    .b-icon { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 18px; flex: none; }
+    .b-no { background: var(--red-soft); color: var(--red); }
+    .b-ok { background: var(--green-soft); color: var(--green); }
+
+    /* Banner 1280x640 */
+    #banner { width: 1280px; height: 640px; }
+    #banner .title { left: 72px; top: 130px; width: 560px; }
+    #banner .modal { right: 70px; top: 110px; width: 470px; padding: 32px; transform: rotate(-2deg); }
+    #banner .grant { right: 96px; top: 500px; padding: 16px 20px; transform: rotate(2deg); }
+
+    /* How it works 1600x900 */
+    #how-it-works, #security, #usage { width: 1600px; height: 900px; }
+    .steps { left: 80px; right: 80px; top: 280px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    .step { padding: 30px 28px; height: 400px; position: relative; }
+    .step-n { font-family: var(--mono); color: var(--amber); font-size: 15px; letter-spacing: 0.16em; }
+    .step-h { font-family: var(--display); font-size: 27px; font-weight: 700; margin-top: 12px; line-height: 1.2; }
+    .step-p { color: var(--muted); font-size: 17px; line-height: 1.5; margin-top: 12px; }
+    .step-v { position: absolute; left: 28px; right: 28px; bottom: 28px; }
+    .arrow { position: absolute; right: -24px; top: 196px; width: 20px; height: 20px; color: var(--amber); font-size: 20px; z-index: 2; }
+    .mini-btn { height: 40px; border-radius: 10px; display: inline-flex; align-items: center; padding: 0 16px; font-weight: 600; font-size: 15px; }
+    .mini-input { height: 42px; border-radius: 10px; border: 1px solid var(--line-strong); background: rgba(2,6,23,.5); display: flex; align-items: center; padding: 0 14px; font-size: 18px; letter-spacing: 4px; }
+</style>
+</head>
+<body>
+
+<!-- Banner -->
+<div class="still stage" id="banner">
+    <div class="grid"></div>
+    <div class="abs title">
+        <svg width="62" height="70" viewBox="0 0 150 170"><path d="M75 8 L138 32 V86 C138 124 110 150 75 162 C40 150 12 124 12 86 V32 Z" fill="rgba(245,158,11,.12)" stroke="#f59e0b" stroke-width="8" stroke-linejoin="round"/><path d="M48 86 L68 106 L104 66" fill="none" stroke="#f59e0b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="eyebrow" style="margin-top: 26px">Filament 5 plugin</div>
+        <div class="h1" style="font-size: 62px; line-height: 1.04; margin-top: 12px">Identity Verification Action</div>
+        <div class="muted" style="font-size: 22px; line-height: 1.45; margin-top: 18px">Ask users to confirm it's them before sensitive actions run, and enforce it on the server.</div>
+        <div style="margin-top: 26px"><span class="chip mono" style="font-size: 14px">syriable/filament-identity-verification-action</span></div>
+    </div>
+    <div class="abs modal card">
+        <div class="shield-badge" style="width: 52px; height: 52px; border-radius: 14px"><svg width="26" height="30" viewBox="0 0 150 170"><path d="M75 8 L138 32 V86 C138 124 110 150 75 162 C40 150 12 124 12 86 V32 Z" fill="none" stroke="#f59e0b" stroke-width="14" stroke-linejoin="round"/></svg></div>
+        <div class="h1" style="font-size: 28px; margin-top: 18px">Confirm your identity</div>
+        <div class="muted" style="font-size: 16px; margin-top: 8px; line-height: 1.45">For your security, please confirm your identity before continuing.</div>
+        <div class="muted" style="font-size: 15px; margin: 22px 0 8px">Current password</div>
+        <div class="mini-input">••••••••••••</div>
+        <div style="display: flex; gap: 10px; margin-top: 22px">
+            <span class="mini-btn" style="background: var(--amber); color: #1a1205">Confirm</span>
+            <span class="mini-btn" style="border: 1px solid var(--line-strong)">Cancel</span>
+        </div>
+    </div>
+    <div class="abs grant card">
+        <div class="mono" style="font-size: 14px; color: var(--green)">✓ grant · update_email · 5 min · single-use</div>
+    </div>
+</div>
+
+<!-- How it works -->
+<div class="still stage" id="how-it-works">
+    <div class="grid"></div>
+    <div class="abs" style="left: 80px; top: 90px">
+        <div class="eyebrow">How it works</div>
+        <div class="h1" style="font-size: 56px; margin-top: 14px">Verify first. Then run, checked on the server.</div>
+        <div class="muted" style="font-size: 22px; margin-top: 12px">The protected form never opens until a scoped grant exists, and every execution re-checks it.</div>
+    </div>
+    <div class="abs steps">
+        <div class="step card">
+            <div class="step-n">STEP 01</div>
+            <div class="step-h">User starts a sensitive action</div>
+            <div class="step-p">Change email, change password, delete account, or any action you protect.</div>
+            <div class="step-v"><span class="mini-btn" style="background: var(--amber); color: #1a1205">Change email</span></div>
+            <div class="arrow">➜</div>
+        </div>
+        <div class="step card">
+            <div class="step-n">STEP 02</div>
+            <div class="step-h">Identity verification modal</div>
+            <div class="step-p">The form is not filled or shown. The user confirms their current password instead. Failures are rate limited.</div>
+            <div class="step-v"><div class="mini-input">••••••••••</div></div>
+            <div class="arrow">➜</div>
+        </div>
+        <div class="step card">
+            <div class="step-n">STEP 03</div>
+            <div class="step-h">Scoped grant is issued</div>
+            <div class="step-p">Bound to the user, guard and purpose. Expires in minutes. Stored only as a hash.</div>
+            <div class="step-v mono" style="font-size: 14px; line-height: 1.9; color: #cbd5e1">
+                <div>purpose <span style="color: var(--amber)">update_email</span></div>
+                <div>expires <span style="color: var(--amber)">5 min</span> · single-use</div>
+            </div>
+            <div class="arrow">➜</div>
+        </div>
+        <div class="step card">
+            <div class="step-n">STEP 04</div>
+            <div class="step-h">Protected action runs</div>
+            <div class="step-p">Filament replaces the modal with your action. On submit the grant is validated and consumed before your code runs.</div>
+            <div class="step-v"><span class="chip" style="color: var(--green); border-color: rgba(34,197,94,.4)">✓ Grant consumed</span></div>
+        </div>
+    </div>
+    <div class="abs muted" style="left: 80px; bottom: 60px; font-size: 18px">Cancel at any step and nothing runs. Authorization, policies and validation are unchanged.</div>
+</div>
+
+<!-- Security -->
+<div class="still stage" id="security">
+    <div class="grid"></div>
+    <div class="abs" style="left: 80px; top: 90px">
+        <div class="eyebrow">Security model</div>
+        <div class="h1" style="font-size: 56px; margin-top: 14px">Not just a modal. Enforced on the server.</div>
+    </div>
+    <div class="abs card" style="left: 80px; top: 240px; width: 700px; height: 460px; padding: 30px 36px">
+        <div class="h1" style="font-size: 28px; margin-bottom: 16px">Rejected before your code runs</div>
+        <div class="row" style="justify-content: flex-start; gap: 16px; font-size: 21px"><div class="b-icon b-no">✕</div>Direct execution without a grant</div>
+        <div class="row" style="justify-content: flex-start; gap: 16px; font-size: 21px"><div class="b-icon b-no">✕</div>Forged, guessed or client-set tokens</div>
+        <div class="row" style="justify-content: flex-start; gap: 16px; font-size: 21px"><div class="b-icon b-no">✕</div>Expired or revoked grants</div>
+        <div class="row" style="justify-content: flex-start; gap: 16px; font-size: 21px"><div class="b-icon b-no">✕</div>Another user's or another guard's grant</div>
+        <div class="row" style="justify-content: flex-start; gap: 16px; font-size: 21px"><div class="b-icon b-no">✕</div>A grant issued for another purpose</div>
+        <div class="row" style="justify-content: flex-start; gap: 16px; font-size: 21px"><div class="b-icon b-no">✕</div>Replayed single-use grants, even concurrently</div>
+    </div>
+    <div class="abs card" style="left: 820px; top: 240px; width: 700px; height: 460px; padding: 30px 36px">
+        <div class="h1" style="font-size: 28px; margin-bottom: 16px">What a grant is bound to</div>
+        <div class="row" style="font-size: 20px"><span class="muted">User</span><span class="mono">model class + key</span></div>
+        <div class="row" style="font-size: 20px"><span class="muted">Auth guard</span><span class="mono">web</span></div>
+        <div class="row" style="font-size: 20px"><span class="muted">Purpose</span><span class="mono" style="color: var(--amber)">update_email</span></div>
+        <div class="row" style="font-size: 20px"><span class="muted">Lifetime</span><span class="mono">300 s (configurable)</span></div>
+        <div class="row" style="font-size: 20px"><span class="muted">Storage</span><span class="mono">sha256 hash only</span></div>
+        <div class="row" style="font-size: 20px"><span class="muted">Revoked on</span><span class="mono">logout · password reset</span></div>
+    </div>
+    <div class="abs card" style="left: 80px; right: 80px; top: 736px; padding: 22px 30px; display: flex; gap: 16px; align-items: center; font-size: 21px">
+        <div class="b-icon b-ok">✓</div><span>A valid grant never bypasses your <b class="mono" style="font-weight: 600; color: var(--amber)">authorize()</b>, policies, visibility or validation rules.</span>
+    </div>
+</div>
+
+<!-- Usage -->
+<div class="still stage" id="usage">
+    <div class="grid"></div>
+    <div class="abs" style="left: 80px; top: 80px">
+        <div class="eyebrow">Usage</div>
+        <div class="h1" style="font-size: 56px; margin-top: 14px">Protect an action in one line</div>
+    </div>
+    <div class="abs card" style="left: 80px; top: 230px; width: 760px; height: 340px; padding: 32px 36px">
+        <div class="muted" style="font-size: 16px; margin-bottom: 16px">Inline action</div>
+<div class="code" style="font-size: 19px"><span class="c">ProtectedAction</span>::<span class="m">make</span>(<span class="s">'updateEmail'</span>)
+    -><span class="m">requiresIdentityVerification</span>(<span class="n">purpose:</span> <span class="s">'update_email'</span>)
+    -><span class="m">schema</span>([
+        <span class="c">TextInput</span>::<span class="m">make</span>(<span class="s">'email'</span>)-><span class="m">email</span>()-><span class="m">required</span>(),
+    ])
+    -><span class="m">authorize</span>(<span class="s">'update'</span>, $user)
+    -><span class="m">action</span>(<span class="k">fn</span> (<span class="k">array</span> $data) => $user-><span class="m">update</span>($data));</div>
+    </div>
+    <div class="abs card" style="left: 80px; top: 600px; width: 760px; height: 250px; padding: 26px 36px">
+        <div class="muted" style="font-size: 16px; margin-bottom: 16px">Or protect any action class</div>
+<div class="code" style="font-size: 19px"><span class="k">class</span> <span class="c">VerifiedDeleteAction</span> <span class="k">extends</span> <span class="c">DeleteAction</span>
+    <span class="k">implements</span> <span class="c">ProtectedByIdentityVerification</span>
+{
+    <span class="k">use</span> <span class="c">RequiresIdentityVerification</span>;
+}</div>
+    </div>
+    <div class="abs card" style="left: 870px; top: 230px; width: 650px; height: 340px; padding: 32px 36px">
+        <div class="muted" style="font-size: 16px; margin-bottom: 16px">Install</div>
+<div class="code" style="font-size: 16px"><span class="d">$</span> composer require \
+    syriable/filament-identity-verification-action
+
+<span class="d">$</span> php artisan \
+    filament-identity-verification-action:install</div>
+        <div class="muted" style="font-size: 16px; margin-top: 18px; line-height: 1.5">Publishes the config and the grants migration, then offers to run it.</div>
+    </div>
+    <div class="abs card" style="left: 870px; top: 600px; width: 650px; height: 250px; padding: 26px 36px">
+        <div class="muted" style="font-size: 16px; margin-bottom: 16px">Panel (optional per-panel defaults)</div>
+<div class="code" style="font-size: 17px">$panel-><span class="m">plugin</span>(
+    <span class="c">IdentityVerificationActionPlugin</span>::<span class="m">make</span>()
+        -><span class="m">grantLifetime</span>(<span class="n">300</span>)
+);</div>
+    </div>
+</div>
+
+<script>
+const s = new URLSearchParams(location.search).get('s') || 'banner';
+document.getElementById(s).classList.add('on');
+</script>
+</body>
+</html>
