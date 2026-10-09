@@ -256,4 +256,4 @@ The suite covers the verification core, the full Livewire flow, direct execution
 
 ## License
 
-No license has been chosen yet. **Requires confirmation by the package owner** before publishing (add a `license` field to `composer.json` and a `LICENSE.md`).
+The MIT License (MIT). See [LICENSE.md](LICENSE.md).
