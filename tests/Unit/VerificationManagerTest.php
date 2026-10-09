@@ -28,6 +28,8 @@ function verificationFailure(Closure $callback): ?VerificationFailure
 }
 
 it('issues a grant for the correct password', function (): void {
+    $this->freezeSecond();
+
     $grant = $this->manager->verify($this->user, 'web', 'password', 'update_email', ['password' => 'correct horse']);
 
     expect($grant->token)->toHaveLength(64)

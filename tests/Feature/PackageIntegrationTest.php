@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
@@ -81,6 +82,8 @@ it('creates independent plugin instances per panel', function (): void {
 });
 
 it('applies per-panel plugin settings to issued grants', function (): void {
+    $this->freezeSecond();
+
     Filament::setCurrentPanel('admin');
     Filament::getPanel('admin')->getPlugin(IdentityVerificationActionPlugin::ID)->grantLifetime(42);
 
@@ -93,7 +96,7 @@ it('applies per-panel plugin settings to issued grants', function (): void {
 
     $expiresAt = DB::table('identity_verification_grants')->value('expires_at');
 
-    expect(now()->diffInSeconds($expiresAt))->toEqualWithDelta(42, 1);
+    expect(Carbon::parse($expiresAt)->getTimestamp() - now()->getTimestamp())->toBe(42);
 });
 
 it('uses the application default guard outside of a panel', function (): void {
