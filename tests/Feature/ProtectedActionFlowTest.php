@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Actions\Contracts\ProtectedByIdentityVerification;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\AccountSettings;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\ActionLog;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\User;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     ActionLog::reset();
@@ -24,7 +24,7 @@ beforeEach(function (): void {
 });
 
 it('opens the verification modal instead of the protected form', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->assertActionMounted(['updateEmail', 'identityVerification'])
         ->assertMountedActionModalSee(['Confirm your identity', 'Current password']);
@@ -34,7 +34,7 @@ it('opens the verification modal instead of the protected form', function (): vo
 });
 
 it('replaces the verification action with the protected action after a correct password', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction()
@@ -57,7 +57,7 @@ it('replaces the verification action with the protected action after a correct p
 });
 
 it('keeps the verification modal open and shows an error for an incorrect password', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'wrong-password'])
         ->callMountedAction()
@@ -71,7 +71,7 @@ it('keeps the verification modal open and shows an error for an incorrect passwo
 });
 
 it('requires a password', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->callMountedAction()
         ->assertHasFormErrors(['password' => 'required'])
@@ -79,7 +79,7 @@ it('requires a password', function (): void {
 });
 
 it('never executes the protected action when verification is cancelled', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->unmountAction()
         ->assertActionNotMounted('updateEmail')
@@ -91,7 +91,7 @@ it('never executes the protected action when verification is cancelled', functio
 });
 
 it('never executes the protected action when its modal is cancelled after verification', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction()
@@ -104,7 +104,7 @@ it('never executes the protected action when its modal is cancelled after verifi
 });
 
 it('requires verification again for every new attempt', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction()
@@ -115,7 +115,7 @@ it('requires verification again for every new attempt', function (): void {
 });
 
 it('preserves the protected action form validation without consuming the grant', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction()
@@ -137,13 +137,13 @@ it('preserves the protected action form validation without consuming the grant',
 });
 
 it('executes a modal-less protected action class only after verification', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('deleteAccount')
         ->assertActionMounted(['deleteAccount', 'identityVerification']);
 
     expect(ActionLog::has('deleteAccount'))->toBeFalse();
 
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('deleteAccount')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction()
@@ -153,7 +153,7 @@ it('executes a modal-less protected action class only after verification', funct
 });
 
 it('issues grants bound to the user, panel guard and the action purpose', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('deleteAccount')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction();
@@ -169,7 +169,7 @@ it('issues grants bound to the user, panel guard and the action purpose', functi
 });
 
 it('rate limits failed verification attempts', function (): void {
-    $component = livewire(AccountSettings::class)->mountAction('updateEmail');
+    $component = Livewire::test(AccountSettings::class)->mountAction('updateEmail');
 
     foreach (range(1, 5) as $attempt) {
         $component
@@ -191,7 +191,7 @@ it('rate limits failed verification attempts', function (): void {
 it('does not execute an unauthorized protected action even after verification', function (): void {
     AccountSettings::$canChangeSecuritySettings = false;
 
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('changeSecuritySettings')
         ->assertActionNotMounted('changeSecuritySettings');
 

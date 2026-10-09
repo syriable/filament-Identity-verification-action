@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Filament\Actions\Action;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
+use Livewire\Livewire;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Actions\Contracts\ProtectedByIdentityVerification;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\ActionLog;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\User;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\UsersTable;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     ActionLog::reset();
@@ -25,7 +25,7 @@ beforeEach(function (): void {
 });
 
 it('protects table record actions and keeps the record after verification', function (): void {
-    $component = livewire(UsersTable::class)
+    $component = Livewire::test(UsersTable::class)
         ->mountAction(TestAction::make('resetUser')->table($this->target))
         ->assertActionMounted([TestAction::make('resetUser')->table($this->target), 'identityVerification'])
         ->fillForm(['password' => 'secret-password'])
@@ -41,7 +41,7 @@ it('protects table record actions and keeps the record after verification', func
 });
 
 it('rejects direct execution of a table record action without a grant', function (): void {
-    livewire(UsersTable::class)
+    Livewire::test(UsersTable::class)
         ->set('mountedActions', [[
             'name' => 'resetUser',
             'arguments' => [ProtectedByIdentityVerification::GRANT_ARGUMENT => str_repeat('a', 64)],

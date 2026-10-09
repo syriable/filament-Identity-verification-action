@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Livewire\Livewire;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Actions\IdentityVerificationAction;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Actions\IdentityVerificationContext;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Actions\ProtectedAction;
@@ -17,7 +18,6 @@ use Syriable\Filament\Plugins\IdentityVerificationAction\Verification\Stores\Dat
 use Syriable\Filament\Plugins\IdentityVerificationAction\Verification\VerificationManager;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Livewire\livewire;
 
 it('autoloads the package namespace', function (): void {
     expect(class_exists(IdentityVerificationActionServiceProvider::class))->toBeTrue()
@@ -86,7 +86,7 @@ it('applies per-panel plugin settings to issued grants', function (): void {
 
     actingAs(User::createWithPassword('user@example.com'));
 
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction();

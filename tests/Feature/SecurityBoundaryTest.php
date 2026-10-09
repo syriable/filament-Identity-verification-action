@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Actions\Contracts\ProtectedByIdentityVerification;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\AccountSettings;
 use Syriable\Filament\Plugins\IdentityVerificationAction\Tests\Fixtures\ActionLog;
@@ -13,7 +14,6 @@ use Syriable\Filament\Plugins\IdentityVerificationAction\Verification\GrantSubje
 use Syriable\Filament\Plugins\IdentityVerificationAction\Verification\VerificationManager;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Livewire\livewire;
 
 const GRANT = ProtectedByIdentityVerification::GRANT_ARGUMENT;
 
@@ -44,7 +44,7 @@ function issueGrant(User $user, string $purpose, string $guard = 'web', ?int $li
  */
 function executeDirectly(string $action, array $arguments = [], array $data = [], array $callArguments = []): mixed
 {
-    return livewire(AccountSettings::class)
+    return Livewire::test(AccountSettings::class)
         ->set('mountedActions', [[
             'name' => $action,
             'arguments' => $arguments,
@@ -138,7 +138,7 @@ it('rejects a replayed single-use grant', function (): void {
 });
 
 it('rejects replaying the grant captured from a completed UI flow', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction();
@@ -155,7 +155,7 @@ it('rejects replaying the grant captured from a completed UI flow', function ():
 });
 
 it('does not let a grant for one protected action be redirected to another by renaming the mounted action', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('exportData')
         ->fillForm(['password' => 'secret-password'])
         ->callMountedAction()
@@ -199,7 +199,7 @@ it('does not let a valid grant bypass authorization, and leaves the grant uncons
 });
 
 it('does not mount the protected form with an invalid grant', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('updateEmail', [GRANT => Str::random(64)])
         ->assertActionMounted(['updateEmail', 'identityVerification']);
 
@@ -207,13 +207,13 @@ it('does not mount the protected form with an invalid grant', function (): void 
 });
 
 it('cannot mount the verification action on its own', function (): void {
-    livewire(AccountSettings::class)
+    Livewire::test(AccountSettings::class)
         ->mountAction('identityVerification')
         ->assertSet('mountedActions', []);
 });
 
 it('rejects verification for an unauthenticated session', function (): void {
-    $component = livewire(AccountSettings::class)
+    $component = Livewire::test(AccountSettings::class)
         ->mountAction('deleteAccount');
 
     auth()->logout();
